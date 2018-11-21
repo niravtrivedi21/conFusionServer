@@ -1,6 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const mongoose = require('mongoose');
+const authenticate = require('../authenticate');
+
 const Leaders = require('../models/leaders');
 
 const leadersRouter = express.Router();
@@ -20,7 +23,7 @@ leadersRouter.route('/')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser,(req, res, next) => {
         // res.end('Will add the leaders: ' + req.body.name + ' with details: ' + req.body.description);
         Leaders.create(req.body)
             .then((leader) => {
@@ -30,11 +33,11 @@ leadersRouter.route('/')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser,(req, res, next) => {
         res.statusCode = 403;
         res.end('PUT opration not supported on /leaders');
     })
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser,(req, res, next) => {
         // res.end('Deleting all the leaders!');
         Leaders.remove()
             .then((resp) => {
@@ -57,12 +60,12 @@ leadersRouter.route('/:leaderId')
         .catch((err) => next(err));
     })
 
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser,(req, res, next) => {
         res.statusCode = 403;
         res.end('POST operation not supported on /leaders/' + req.params.leaderId);
     })
 
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser,(req, res, next) => {
         // res.write('Updating the leader: ' + req.params.leaderId + '\n');
         // res.end('Will update the leader: ' + req.body.name +
         //     ' with details: ' + req.body.description);
@@ -77,7 +80,7 @@ leadersRouter.route('/:leaderId')
             .catch((err) => next(err));
     })
 
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser,(req, res, next) => {
         // res.end('Deleting leader: ' + req.params.leaderId);
         Leaders.findByIdAndRemove(req.params.dishId)
         .then((resp) => {

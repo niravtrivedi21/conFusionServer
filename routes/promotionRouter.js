@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const authenticate = require('../authenticate');
+
 const Promotions = require('../models/promotions');
 
 const promotionsRouter = express.Router();
@@ -19,7 +21,7 @@ promotionsRouter.route('/')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser,(req, res, next) => {
         // res.end('Will add the promotions: ' + req.body.name + ' with details: ' + req.body.description);
 
         Promotions.create(req.body)
@@ -32,11 +34,11 @@ promotionsRouter.route('/')
             .catch((err) => next(err));
 
     })
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser,(req, res, next) => {
         res.statusCode = 403;
         res.end('PUT opration not supported on /promotions');
     })
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser,(req, res, next) => {
         // res.end('Deleting all the promotions!');
         Promotions.remove()
             .then((resp) => {
@@ -59,12 +61,12 @@ promotionsRouter.route('/:promoId')
         .catch((err) => next(err));
     })
 
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser,(req, res, next) => {
         res.statusCode = 403;
         res.end('POST operation not supported on /promotions/' + req.params.promoId);
     })
 
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser,(req, res, next) => {
         // res.write('Updating the promotion: ' + req.params.promoId + '\n');
         // res.end('Will update the promotion: ' + req.body.name +
         //     ' with details: ' + req.body.description);
@@ -79,7 +81,7 @@ promotionsRouter.route('/:promoId')
             .catch((err) => next(err));
     })
 
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser,(req, res, next) => {
         // res.end('Deleting promotion: ' + req.params.promoId);
         Promotions.findByIdAndRemove(req.params.promoId)
         .then((resp) => {
