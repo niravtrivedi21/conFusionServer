@@ -5,6 +5,8 @@ const authenticate = require('../authenticate');
 
 const Promotions = require('../models/promotions');
 
+const cors = require('./cors');
+
 const promotionsRouter = express.Router();
 
 promotionsRouter.use(bodyParser.json());
@@ -12,7 +14,10 @@ promotionsRouter.use(bodyParser.json());
 
 
 promotionsRouter.route('/')
-    .get((req, res, next) => {
+.options(cors.corsWithOptions, (req, res) => {
+    res.sendStatus(200);
+})
+    .get(cors.cors, (req, res, next) => {
         Promotions.find({})
             .then((promos) => {
                 res.statusCode = 200;
@@ -21,7 +26,7 @@ promotionsRouter.route('/')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .post(authenticate.verifyUser,(req, res, next) => {
+    .post(cors.corsWithOptions, authenticate.verifyUser,(req, res, next) => {
         // res.end('Will add the promotions: ' + req.body.name + ' with details: ' + req.body.description);
 
         Promotions.create(req.body)
@@ -34,7 +39,7 @@ promotionsRouter.route('/')
             .catch((err) => next(err));
 
     })
-    .put(authenticate.verifyUser,(req, res, next) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser,(req, res, next) => {
         res.statusCode = 403;
         res.end('PUT opration not supported on /promotions');
     })
@@ -50,7 +55,10 @@ promotionsRouter.route('/')
     })
 
 promotionsRouter.route('/:promoId')
-    .get((req, res, next) => {
+.options(cors.corsWithOptions, (req, res) => {
+    res.sendStatus(200);
+})
+    .get(cors.cors, (req, res, next) => {
         // res.end('Will send details of the promotion: ' + req.params.promoId + ' to you!');
         Promotions.findById(req.params.promoId)
         .then((promo) => {
@@ -61,12 +69,12 @@ promotionsRouter.route('/:promoId')
         .catch((err) => next(err));
     })
 
-    .post(authenticate.verifyUser,(req, res, next) => {
+    .post(cors.corsWithOptions, authenticate.verifyUser,(req, res, next) => {
         res.statusCode = 403;
         res.end('POST operation not supported on /promotions/' + req.params.promoId);
     })
 
-    .put(authenticate.verifyUser,(req, res, next) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser,(req, res, next) => {
         // res.write('Updating the promotion: ' + req.params.promoId + '\n');
         // res.end('Will update the promotion: ' + req.body.name +
         //     ' with details: ' + req.body.description);
@@ -81,7 +89,7 @@ promotionsRouter.route('/:promoId')
             .catch((err) => next(err));
     })
 
-    .delete(authenticate.verifyUser,(req, res, next) => {
+    .delete(cors.corsWithOptions, authenticate.verifyUser,(req, res, next) => {
         // res.end('Deleting promotion: ' + req.params.promoId);
         Promotions.findByIdAndRemove(req.params.promoId)
         .then((resp) => {
